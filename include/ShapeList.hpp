@@ -6,14 +6,16 @@
 class ShapeList {
 private:
     ShapeNode* head;
+    int size;
 
 public:
     ShapeList();
     ~ShapeList();
 
     void addShape(Shape* s);
-    void removeShape();
+    void removeIndex(int index);
     Shape* getShape(int index);
+    int getSize() const;
 };
 
 #endif

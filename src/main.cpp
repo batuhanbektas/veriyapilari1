@@ -4,7 +4,7 @@ using namespace std;
 
 int main(){
 
-    cout << "zort" << endl;
+    cout << "zort1212" << endl;
 
     return 0;
 }

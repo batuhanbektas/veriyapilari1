@@ -9,6 +9,7 @@ public:
     ShapeNode* next;
 
     ShapeNode(Shape* s);
+    ~ShapeNode();
 };
 
 #endif

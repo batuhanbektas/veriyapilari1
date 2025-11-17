@@ -6,18 +6,22 @@
 class MainList {
 private:
     MainNode* head;
+    MainNode* tail;
     MainNode* current;
+    int size;
 
 public:
     MainList();
     ~MainList();
 
-    void addNode();
-    void removeNode();
-    void nextNode();
-    void prevNode();
+    void addNode();          
+    void removeCurrent();    
+
+    void nextNode();         
+    void prevNode();         
 
     MainNode* getCurrent();
+    int getSize() const;
 };
 
 #endif
