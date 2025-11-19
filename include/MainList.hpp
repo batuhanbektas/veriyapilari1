@@ -22,6 +22,9 @@ public:
 
     MainNode* getCurrent();
     int getSize() const;
+
+    void generateRandom(int count);
+
 };
 
 #endif

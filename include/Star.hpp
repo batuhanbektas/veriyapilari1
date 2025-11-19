@@ -5,8 +5,10 @@
 
 class Star : public Shape {
 public:
-    Star(int x, int y, int w, int h, char c, int z);
-    void draw(Screen& s) override;
+    // width ve height yıldızın yatay/dikey boyutunu belirliyor
+    Star(int x, int y, int width, int height, int z, char drawChar);
+
+    virtual void draw(Screen& screen) override;
 };
 
 #endif

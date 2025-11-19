@@ -3,12 +3,11 @@
 
 #include "Shape.hpp"
 
-class Rectangle : public Shape{
+class Rectangle : public Shape {
+public:
+    Rectangle(int x, int y, int width, int height, int z, char drawChar);
 
-    public:
-        Rectangle(int x, int y, int w, int h, char c, int z);
-        void draw(Screen& s) override;
+    virtual void draw(Screen& screen) override;
 };
-
 
 #endif

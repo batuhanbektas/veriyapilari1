@@ -1,33 +1,35 @@
 #ifndef SHAPE_HPP
 #define SHAPE_HPP
 
-class Screen;
+#include "Screen.hpp"
 
 class Shape {
 protected:
-    int x, y;
-    int width, height;
-    char drawChar;
+    int x;
+    int y;
+    int width;
+    int height;
     int z;
+    char drawChar;
 
 public:
-    Shape(int x, int y, int w, int h, char c, int z);
+    Shape(int x, int y, int width, int height, int z, char drawChar);
     virtual ~Shape();
 
-    virtual void draw(Screen& s) = 0;
-    virtual void move(int dx, int dy);
-
+    // Temel getter'lar
     int getX() const;
     int getY() const;
     int getWidth() const;
     int getHeight() const;
     int getZ() const;
-    char getChar() const;
+    char getDrawChar() const;
 
     void setPosition(int newX, int newY);
-    void setSize(int newW, int newH);
-    void setChar(char c);
     void setZ(int newZ);
+
+    // Polimorfik arayüz
+    virtual void draw(Screen& screen) = 0;
+    virtual void move(int dx, int dy);
 };
 
 #endif

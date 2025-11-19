@@ -4,9 +4,11 @@
 #include "Shape.hpp"
 
 class Triangle : public Shape {
-    public:
-        Triangle(int x, int y, int w, int h, char c, int z);
-        void draw(Screen& s) override;
+public:
+    // height: üçgenin yüksekliği, width: taban genişliği gibi düşünebilirsin
+    Triangle(int x, int y, int width, int height, int z, char drawChar);
+
+    virtual void draw(Screen& screen) override;
 };
 
 #endif

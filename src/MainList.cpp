@@ -1,3 +1,15 @@
+/**
+* @file MainList.cpp
+* @description MainList sınıfının üye fonksiyonlarının tanımlandığı dosya
+* @course Veri Yapıları 2-A
+* @assignment 1.Ödev
+* @date 17.11.2025
+* @author Batuhan Bektaş batuhan.bektas1@ogr.sakarya.edu.tr G231210379
+*/
+
+
+#include <cstdlib>
+#include <ctime>
 #include "../include/MainList.hpp"
 #include <iostream>
 
@@ -26,6 +38,42 @@ void MainList::addNode() {
 
     size++;
 }
+
+void MainList::generateRandom(int count) {
+    srand(time(nullptr));
+
+    for(int i=0; i<count; i++) {
+        MainNode* n = new MainNode();
+        
+        // 2 ile 7 arası shape
+        int shapeCount = 2 + (rand() % 6);
+
+        for(int s=0; s<shapeCount; s++) {
+            // Rastgele bir shape tipi seç
+            int t =rand() % 3;
+            Shape* sh = nullptr;
+
+            int x = rand() % (COLS - 5);
+            int y = rand() % (ROWS - 5);
+            int w = 2 + rand() % 10;
+            int h = 2 + rand() % 10;
+            char c = 'A' + rand() % 26;
+            int z = rand() % 100;
+
+            if(t == 0)
+                sh = new Rectangle(x, y, w, h, c, z);
+            else if(t == 1)
+                sh = new Triangle(x, y, w, h, c, z);
+            else
+                sh = new Star(x, y, w, h, c, z);
+
+            n->shapes.addShape(sh);
+        }
+
+        addNode(n);
+    }
+}
+
 
 void MainList::removeCurrent() {
     if (current == nullptr) return;

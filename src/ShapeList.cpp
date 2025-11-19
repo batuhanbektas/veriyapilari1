@@ -1,3 +1,13 @@
+/**
+* @file ShapeList.cpp
+* @description ShapeList sınıfının üye fonksiyonlarının tanımlandığı dosya
+* @course Veri Yapıları 2-A
+* @assignment 1.Ödev
+* @date 17.11.2025
+* @author Batuhan Bektaş batuhan.bektas1@ogr.sakarya.edu.tr G231210379
+*/
+
+
 #include "../include/ShapeList.hpp"
 #include <iostream>
 

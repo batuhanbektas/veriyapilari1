@@ -1,5 +1,3 @@
-# === Basit Makefile ===
-
 hepsi: derle calistir
 
 derle:
