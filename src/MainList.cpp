@@ -12,6 +12,15 @@
 #include <ctime>
 #include "../include/MainList.hpp"
 #include <iostream>
+#include <algorithm>
+#include "../include/Rectangle.hpp"
+#include "../include/Triangle.hpp"
+#include "../include/Star.hpp"
+#include "../include/Screen.hpp"
+#include "../include/ShapeNode.hpp"
+#include "MainNode.hpp"
+#include "../include/ShapeList.hpp"
+#include "../include/Shape.hpp"
 
 MainList::MainList() : head(nullptr), tail(nullptr), current(nullptr), size(0) {}
 
@@ -24,9 +33,7 @@ MainList::~MainList() {
     }
 }
 
-void MainList::addNode() {
-    MainNode* n = new MainNode();
-
+void MainList::addNode(MainNode* n) {
     if (head == nullptr) {
         head = tail = current = n;
     } 
@@ -38,6 +45,9 @@ void MainList::addNode() {
 
     size++;
 }
+
+
+
 
 void MainList::generateRandom(int count) {
     srand(time(nullptr));
@@ -57,17 +67,19 @@ void MainList::generateRandom(int count) {
             int y = rand() % (ROWS - 5);
             int w = 2 + rand() % 10;
             int h = 2 + rand() % 10;
-            char c = 'A' + rand() % 26;
+            const char chars[] = { '#', '*', '&' };
+            char c = chars[rand() % 3];
             int z = rand() % 100;
 
+                        
             if(t == 0)
-                sh = new Rectangle(x, y, w, h, c, z);
+                sh = new Rectangle(x, y, w, h, z, c);
             else if(t == 1)
-                sh = new Triangle(x, y, w, h, c, z);
+                sh = new Triangle(x, y, w, h, z, c);
             else
-                sh = new Star(x, y, w, h, c, z);
+                sh = new Star(x, y, w, h, z, c);
 
-            n->shapes.addShape(sh);
+                n->shapes.addShape(sh);
         }
 
         addNode(n);
@@ -93,6 +105,32 @@ else
     delete del;
     size--;
 }
+
+
+void MainList::drawAll(Screen& s) {
+    std::vector<Shape*> allShapes;
+
+    // Tüm node'ları gez
+    MainNode* temp = head;
+    while(temp) {
+        // Bu node'un shapes listesini diziye at
+        ShapeNode* cur = temp->shapes.getHead();
+        while(cur) {
+            allShapes.push_back(cur->data);
+            cur = cur->next;
+        }
+        temp = temp->next;
+    }
+
+    // Z-değerine göre sırala
+    sort(allShapes.begin(), allShapes.end(),
+              [](Shape* a, Shape* b) { return a->getZ() < b->getZ(); });
+
+    // Tüm şekilleri ekrana çiz
+    for(Shape* sh : allShapes) 
+        sh->draw(s);
+}
+
 
 void MainList::nextNode() {
     if (current && current->next != nullptr)

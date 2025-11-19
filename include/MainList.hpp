@@ -2,6 +2,7 @@
 #define MAINLIST_HPP
 
 #include "MainNode.hpp"
+#include <vector>
 
 class MainList {
 private:
@@ -14,11 +15,17 @@ public:
     MainList();
     ~MainList();
 
-    void addNode();          
+ 
+    void addNode(MainNode* n);
+      
     void removeCurrent();    
 
     void nextNode();         
-    void prevNode();         
+    void prevNode();        
+    
+
+    void drawAll(Screen& s);
+
 
     MainNode* getCurrent();
     int getSize() const;

@@ -16,6 +16,9 @@ public:
     void removeIndex(int index);
     Shape* getShape(int index);
     int getSize() const;
+
+    ShapeNode* getHead() const;  
 };
+
 
 #endif

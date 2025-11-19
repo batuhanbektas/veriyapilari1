@@ -73,3 +73,7 @@ Shape* ShapeList::getShape(int index) {
 int ShapeList::getSize() const {
     return size;
 }
+
+ShapeNode* ShapeList::getHead() const {
+    return head;
+}

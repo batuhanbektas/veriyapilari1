@@ -11,20 +11,14 @@
 #include "Rectangle.hpp"
 #include "Triangle.hpp"
 #include "Star.hpp"
+#include <iostream>
+#include "MainList.hpp"
+#include "App.hpp"
+
+using namespace std;
 
 int main() {
-    Screen screen;
-    screen.clear();
-
-    Rectangle rect(5, 3, 10, 4, 0, '#');
-    Triangle tri(30, 5, 10, 6, 1, '*');
-    Star star(50, 8, 7, 5, 2, '+');
-
-    rect.draw(screen);
-    tri.draw(screen);
-    star.draw(screen);
-
-    screen.render();
-
+    App app;
+    app.run();
     return 0;
 }
