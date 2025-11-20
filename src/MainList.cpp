@@ -13,6 +13,7 @@
 #include "../include/MainList.hpp"
 #include <iostream>
 #include <algorithm>
+#include <vector>              
 #include "../include/Rectangle.hpp"
 #include "../include/Triangle.hpp"
 #include "../include/Star.hpp"
@@ -21,6 +22,7 @@
 #include "MainNode.hpp"
 #include "../include/ShapeList.hpp"
 #include "../include/Shape.hpp"
+
 
 using namespace std;
 
@@ -49,43 +51,73 @@ MainList::~MainList() {
     }
 }
 
+MainNode* MainList::getHead() const {
+    return head;
+}
+
+
 
 void MainList::generateRandom(int count) {
-    srand(time(nullptr));
+    srand(time(nullptr)); // tek sefer çağrılacağı için sorun yok
 
-    for(int i=0; i<count; i++) {
+    for (int i = 0; i < count; i++) {
         MainNode* n = new MainNode();
         
-        // 2 ile 7 arası shape
-        int shapeCount = 2 + (rand() % 6);
+        // 3 ile 10 arası shape (max 10 olacak şekilde)
+        int shapeCount = 3 + (rand() % 8); // 3..10
 
-        for(int s=0; s<shapeCount; s++) {
+        // Her node kendi rastgele seed’ine göre farklı sahneye sahip olsun
+        unsigned int nodeSeed = static_cast<unsigned int>(time(nullptr)) + i * 37;
+        srand(nodeSeed);
 
-            int t =rand() % 3;
+        for (int s = 0; s < shapeCount; s++) {
+            int t = rand() % 3;
             Shape* sh = nullptr;
 
-            int x = rand() % (COLS - 5);
-            int y = rand() % (ROWS - 5);
-            int w = 2 + rand() % 10;
-            int h = 2 + rand() % 10;
-            const char chars[] = { '#', '*', '&' };
-            char c = chars[rand() % 3];
+            // Boyutları seç
+            int w = 2 + rand() % 10; // 2..11
+            int h = 2 + rand() % 10; // 2..11
+
+            // Ekranı aşmaması için garanti
+            if (w >= COLS) w = COLS - 1;
+            if (h >= ROWS) h = ROWS - 1;
+
+            int maxX = COLS - w;
+            int maxY = ROWS - h;
+
+            if (maxX < 0) maxX = 0;
+            if (maxY < 0) maxY = 0;
+
+            // Solda liste için boşluk bırak
+            int minX = 10;
+            if (minX > maxX) minX = 0;
+
+            int x = minX + (rand() % (maxX - minX + 1));
+            int y = rand() % (maxY + 1);
+
+            const char chars[] = { '#', '*', '&', '+', 'o' };
+            char c = chars[rand() % 5];
             int z = rand() % 100;
 
-                        
-            if(t == 0)
+            if (t == 0)
                 sh = new Rectangle(x, y, w, h, z, c);
-            else if(t == 1)
+            else if (t == 1)
                 sh = new Triangle(x, y, w, h, z, c);
             else
                 sh = new Star(x, y, w, h, z, c);
 
-                n->shapes.addShape(sh);
+            n->shapes.addShape(sh);
         }
 
         addNode(n);
     }
+
+    // Liste oluşturulduktan sonra tekrar ana random’u karıştır
+    srand(static_cast<unsigned int>(time(nullptr)));
 }
+
+
+
 
 
 void MainList::removeCurrent() {
@@ -109,28 +141,29 @@ else
 
 
 void MainList::drawAll(Screen& s) {
+    // Hiç node yoksa hiçbir şey çizme
+    if (current == nullptr)
+        return;
+
     std::vector<Shape*> allShapes;
 
-    // Tüm node'ları gez
-    MainNode* temp = head;
-    while(temp) {
-        // Bu node'un shapes listesini diziye at
-        ShapeNode* cur = temp->shapes.getHead();
-        while(cur) {
-            allShapes.push_back(cur->data);
-            cur = cur->next;
-        }
-        temp = temp->next;
+    // SADECE current node'un içindeki şekilleri al
+    ShapeNode* cur = current->shapes.getHead();
+    while (cur) {
+        allShapes.push_back(cur->data);
+        cur = cur->next;
     }
 
-    // Z-değerine göre sırala
-    sort(allShapes.begin(), allShapes.end(),
+    // Z-değerine göre sırala (önce arkadakiler, sonra öndekiler)
+    std::sort(allShapes.begin(), allShapes.end(),
               [](Shape* a, Shape* b) { return a->getZ() < b->getZ(); });
 
-    // Tüm şekilleri ekrana çiz
-    for(Shape* sh : allShapes) 
+    // Sadece bu node'un şekillerini ekrana çiz
+    for (Shape* sh : allShapes) {
         sh->draw(s);
+    }
 }
+
 
 
 void MainList::nextNode() {

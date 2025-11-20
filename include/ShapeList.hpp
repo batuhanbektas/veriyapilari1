@@ -5,21 +5,20 @@
 
 class ShapeList {
 private:
-    
+    ShapeNode* head;
     int size;
 
 public:
-    ShapeNode* head;
     ShapeList();
     ~ShapeList();
 
     void addShape(Shape* s);
     void removeIndex(int index);
     Shape* getShape(int index);
-    int getSize() const;
 
+    int  getSize()   const;
+    bool isEmpty()   const;   // <- eklendi
     ShapeNode* getHead() const;  
 };
-
 
 #endif

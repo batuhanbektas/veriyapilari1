@@ -13,6 +13,9 @@ public:
     MainNode* tail;
     MainNode* current;
 
+    MainNode* getHead() const;
+
+
     MainList();
     ~MainList();
 

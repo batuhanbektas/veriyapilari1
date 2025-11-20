@@ -3,11 +3,12 @@
  * @description Program akışı, kullanıcı etkileşimi, liste ve şekil kontrolü
  * @course Veri Yapıları 2-A
  * @assignment 1.Ödev
- * @date 19.11.2025
+ * @date 20.11.2025
  */
 
 #include <iostream>
 #include <conio.h>
+#include <string>
 #include "../include/App.hpp"
 #include "../include/MainList.hpp"
 #include "../include/Shape.hpp"
@@ -15,94 +16,198 @@
 #include "../include/Screen.hpp"
 
 App::App() {
-    currentMain = mainList.head;
-    currentShape = (currentMain ? currentMain->shapes.getHead() : nullptr);
+    // Başlangıçta sahneyi rasgele oluştur
+    mainList.generateRandom(10);  // ~20 node
+
+    currentMain  = mainList.getCurrent();
+    currentShape = nullptr;
+    mode         = MODE_LIST;     // önce liste modundan başla
+}
+
+void App::drawNodeList(Screen& screen) {
+    MainNode* node = mainList.getHead();
+    int idx = 0;
+    int y   = 0;
+
+    while (node && y < ROWS) {
+        int displayIndex = idx + 1; // 1'den başlasın
+        int shapeCount   = node->shapes.getSize();
+
+        std::string line = std::to_string(displayIndex) + " (" + std::to_string(shapeCount) + ")";
+        if (node == currentMain)
+            line += " <--";
+
+        for (size_t i = 0; i < line.size() && (int)i < COLS; ++i) {
+            screen.setPixel((int)i, y, line[i]);
+        }
+
+        node = node->next;
+        y++;
+        idx++;
+    }
 }
 
 void App::renderAll(Screen& screen) {
+    // Tüm şekilleri z-sıralı çizer
     mainList.drawAll(screen);
 
-    // Seçili shape'i işaretleme (isteğe bağlı)
-    if (currentShape) {
+    // Solda node listesini çiz
+    drawNodeList(screen);
+
+    // Şekil modunda isek seçili shape'i işaretle
+    if (mode == MODE_SHAPE && currentShape) {
         Shape* s = currentShape->data;
-        screen.setPixel(s->getX(), s->getY(), '@');  // seçili shape gösterge
+        screen.setPixel(s->getX(), s->getY(), '@');  // seçili shape işareti
     }
 }
 
 void App::handleInput(char key) {
     //---------------------------------------
-    // NODE GEÇİŞİ
+    // 1) LİSTE MODU – sadece node'lar arasında gezinme
     //---------------------------------------
-    if (key == 'd' || key == 'D') {
-        mainList.nextNode();
-        currentMain = mainList.getCurrent();
-        currentShape = (currentMain ? currentMain->shapes.getHead() : nullptr);
-        return;
-    }
-    else if (key == 'a' || key == 'A') {
-        mainList.prevNode();
-        currentMain = mainList.getCurrent();
-        currentShape = (currentMain ? currentMain->shapes.getHead() : nullptr);
-        return;
-    }
-
-    //---------------------------------------
-    // SHAPE GEÇİŞİ
-    //---------------------------------------
-    if (!currentMain) return;
-
-    if (key == 's' || key == 'S') {
-        if (currentShape && currentShape->next)
-            currentShape = currentShape->next;
-        return;
-    }
-    else if (key == 'w' || key == 'W') {
-        if (currentShape != currentMain->shapes.getHead()) {
-            ShapeNode* iter = currentMain->shapes.getHead();
-            while (iter->next != currentShape)
-                iter = iter->next;
-            currentShape = iter;
+    if (mode == MODE_LIST) {
+        if (key == 'w' || key == 'W') {
+            mainList.prevNode();
+            currentMain  = mainList.getCurrent();
+            currentShape = nullptr;
+            return;
         }
-        return;
-    }
-
-    //---------------------------------------
-    // SHAPE HAREKETİ
-    //---------------------------------------
-    if (currentShape) {
-        Shape* s = currentShape->data;
-
-        if (key == 'i' || key == 'I') s->move(0, -1);  // yukarı
-        if (key == 'k' || key == 'K') s->move(0, 1);   // aşağı
-        if (key == 'j' || key == 'J') s->move(-1, 0);  // sol
-        if (key == 'l' || key == 'L') s->move(1, 0);   // sağ
-    }
-
-    //---------------------------------------
-    // SHAPE SİL
-    //---------------------------------------
-    if (key == 'x' || key == 'X') {
-        if (currentMain && currentShape) {
-            int index = 0;
-            ShapeNode* iter = currentMain->shapes.getHead();
-
-            while (iter && iter != currentShape) {
-                iter = iter->next;
-                index++;
-            }
-
-            currentMain->shapes.removeIndex(index);
+        if (key == 's' || key == 'S') {
+            mainList.nextNode();
+            currentMain  = mainList.getCurrent();
+            currentShape = nullptr;
+            return;
+        }
+        // Şu anki node'u seç ve şekil moduna gir
+        if ((key == 'f' || key == 'F') && currentMain) {
+            mode         = MODE_SHAPE;
             currentShape = currentMain->shapes.getHead();
+            return;
         }
+        // Node sil
+        if (key == 'c' || key == 'C') {
+            mainList.removeCurrent();
+            currentMain  = mainList.getCurrent();
+            currentShape = nullptr;
+            return;
+        }
+
+        // Liste modunda başka tuşlar bir şey yapmasın
+        return;
     }
 
     //---------------------------------------
-    // NODE SİL
+    // 2) ŞEKİL MODU – seçili node'un şekilleri
     //---------------------------------------
-    if (key == 'z' || key == 'Z') {
+    if (mode == MODE_SHAPE) {
+
+          if (currentMain && currentMain->shapes.isEmpty()) {
         mainList.removeCurrent();
-        currentMain = mainList.getCurrent();
-        currentShape = (currentMain ? currentMain->shapes.getHead() : nullptr);
+        currentMain  = mainList.getCurrent();
+        currentShape = nullptr;
+        mode         = MODE_LIST;
+        return;
+    }
+
+        if (!currentMain) {
+            // Node kalmamışsa tekrar liste moduna dön
+            mode         = MODE_LIST;
+            currentShape = nullptr;
+            return;
+        }
+
+        // g: liste moduna geri dön
+        if (key == 'g' || key == 'G') {
+            mode         = MODE_LIST;
+            currentShape = nullptr;
+            return;
+        }
+
+        // q: önceki shape
+        if (key == 'q' || key == 'Q') {
+            if (currentShape && currentShape != currentMain->shapes.getHead()) {
+                ShapeNode* iter = currentMain->shapes.getHead();
+                while (iter && iter->next != currentShape)
+                    iter = iter->next;
+                if (iter) currentShape = iter;
+            }
+            return;
+        }
+
+        // e: sonraki shape
+        if (key == 'e' || key == 'E') {
+            if (currentShape && currentShape->next)
+                currentShape = currentShape->next;
+            return;
+        }
+
+      // c: seçili shape'i sil
+if (key == 'c' || key == 'C') {
+    if (currentMain && currentShape) {
+
+        // 1) currentShape'in listedeki indeksini bul
+        int index = 0;
+        ShapeNode* iter = currentMain->shapes.getHead();
+        while (iter && iter != currentShape) {
+            iter = iter->next;
+            index++;
+        }
+
+        // Her ihtimale karşı: currentShape listede değilse hiçbir şey yapma
+        if (!iter) return;
+
+        // 2) Seçili shape'i sil
+        currentMain->shapes.removeIndex(index);
+
+        // 3) Bu node'un içinde hiç shape kalmadıysa node'u da sil
+        if (currentMain->shapes.isEmpty()) {
+            mainList.removeCurrent();              // current node'u listeden sil
+            currentMain  = mainList.getCurrent();  // yeni current node (veya nullptr)
+            currentShape = nullptr;
+            mode         = MODE_LIST;              // şekil kalmadı, liste moduna dön
+            return;                                // önemli: buradan çık
+        }
+
+        // 4) Hâlâ şekil varsa, basitçe baştaki shape'i seç
+        currentShape = currentMain->shapes.getHead();
+    }
+    return;
+
+}
+
+
+        // Hareket: w/a/s/d
+        if (currentShape) {
+            Shape* s = currentShape->data;
+            int dx = 0, dy = 0;
+
+            if (key == 'w' || key == 'W') dy = -1; // yukarı
+            if (key == 's' || key == 'S') dy =  1; // aşağı
+            if (key == 'a' || key == 'A') dx = -1; // sol
+            if (key == 'd' || key == 'D') dx =  1; // sağ
+
+            if (dx != 0 || dy != 0) {
+                s->move(dx, dy);
+
+                // sınır kontrolü
+                int x = s->getX();
+                int y = s->getY();
+                int w = s->getWidth();
+                int h = s->getHeight();
+
+                if (x < 0) x = 0;
+                if (y < 0) y = 0;
+                if (x + w > COLS) x = COLS - w;
+                if (y + h > ROWS) y = ROWS - h;
+
+                if (x < 0) x = 0;
+                if (y < 0) y = 0;
+
+                s->setPosition(x, y);
+            }
+        }
+
+        return;
     }
 }
 
@@ -115,14 +220,33 @@ void App::run() {
         renderAll(screen);
         screen.render();
 
-        std::cout << "\n[ A ] <-- Node   |   Node --> [ D ]\n";
-        std::cout << "[ W ] <-- Shape  |  Shape --> [ S ]\n";
-        std::cout << "[ I J K L ] Move Shape\n";
-        std::cout << "[ X ] Shape Sil   |   [ Z ] Node Sil\n";
-        std::cout << "[ Q ] Çıkış\n";
+        std::cout << "\n-------------------------\n";
+        std::cout << "Node sayisi : " << mainList.getSize() << "\n";
+
+        if (currentMain) {
+            int shapeCount = currentMain->shapes.getSize();
+            std::cout << "Aktif Node Shape sayisi : " << shapeCount << "\n";
+        } else {
+            std::cout << "Listede hic Node kalmadi.\n";
+        }
+
+        if (mode == MODE_LIST) {
+            std::cout << "\n[LİSTE MODU]\n";
+            std::cout << "(w/s) listede yukari/asagi\n";
+            std::cout << "(f)   secili node'un sekillerine git\n";
+            std::cout << "(c)   node sil\n";
+        } else {
+            std::cout << "\n[SEKİL MODU]\n";
+            std::cout << "(w/a/s/d) sekli hareket ettir\n";
+            std::cout << "(q) onceki sekil   (e) sonraki sekil\n";
+            std::cout << "(c) sekil sil      (g) liste moduna don\n";
+        }
+
+        std::cout << "\n(0) Cikis\n";
 
         key = _getch();
-        if (key == 'q' || key == 'Q') break;
+        if (key == '0') // 0'a basınca programdan tamamen çık
+            break;
 
         handleInput(key);
     }
