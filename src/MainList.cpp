@@ -38,7 +38,14 @@ void MainList::addNode(MainNode* n) {
 }
 
 
-
+MainList::~MainList() {
+    MainNode* temp = head;
+    while (temp != nullptr) {
+        MainNode* toDelete = temp;
+        temp = temp->next;
+        delete toDelete;
+    }
+}
 
 
 void MainList::generateRandom(int count) {
