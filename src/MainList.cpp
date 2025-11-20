@@ -26,15 +26,6 @@ using namespace std;
 
 MainList::MainList() : head(nullptr), tail(nullptr), current(nullptr), size(0) {}
 
-MainList::~MainList() {
-    MainNode* temp = head;
-    while (temp != nullptr) {
-        MainNode* toDelete = temp;
-        temp = temp->next;
-        delete toDelete;
-    }
-}
-
 void MainList::addNode(MainNode* n) {
     if (head == nullptr) {
         head = tail = current = n;
@@ -49,6 +40,14 @@ void MainList::addNode(MainNode* n) {
 }
 
 
+MainList::~MainList() {
+    MainNode* temp = head;
+    while (temp != nullptr) {
+        MainNode* toDelete = temp;
+        temp = temp->next;
+        delete toDelete;
+    }
+}
 
 
 void MainList::generateRandom(int count) {
