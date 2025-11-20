@@ -3,7 +3,7 @@
 * @description MainList sınıfının üye fonksiyonlarının tanımlandığı dosya
 * @course Veri Yapıları 2-A
 * @assignment 1.Ödev
-* @date 17.11.2025
+* @date 19.11.2025
 * @author Batuhan Bektaş batuhan.bektas1@ogr.sakarya.edu.tr G231210379
 */
 
@@ -21,6 +21,8 @@
 #include "MainNode.hpp"
 #include "../include/ShapeList.hpp"
 #include "../include/Shape.hpp"
+
+using namespace std;
 
 MainList::MainList() : head(nullptr), tail(nullptr), current(nullptr), size(0) {}
 
@@ -59,7 +61,7 @@ void MainList::generateRandom(int count) {
         int shapeCount = 2 + (rand() % 6);
 
         for(int s=0; s<shapeCount; s++) {
-            // Rastgele bir shape tipi seç
+
             int t =rand() % 3;
             Shape* sh = nullptr;
 
@@ -149,3 +151,4 @@ MainNode* MainList::getCurrent() {
 int MainList::getSize() const {
     return size;
 }
+

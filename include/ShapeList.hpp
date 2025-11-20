@@ -5,10 +5,11 @@
 
 class ShapeList {
 private:
-    ShapeNode* head;
+    
     int size;
 
 public:
+    ShapeNode* head;
     ShapeList();
     ~ShapeList();
 

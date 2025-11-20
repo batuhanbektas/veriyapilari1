@@ -24,7 +24,7 @@ void Screen::clear() {
 
 void Screen::setPixel(int x, int y, char c) {
     if (x < 0 || x >= COLS || y < 0 || y >= ROWS) {
-        return; // Ekran dışına taşarsa görmezden gel
+        return;
     }
     buffer[y][x] = c;
 }

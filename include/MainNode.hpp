@@ -1,15 +1,14 @@
-#ifndef MAINNODE_HPP
-#define MAINNODE_HPP
-
+#include "../include/MainList.hpp"
+#include <cstdlib>
+#include <ctime>
+#include <iostream>
 #include "ShapeList.hpp"
 
-class MainNode{
-    public:
-        ShapeList shapes;
-        MainNode* prev;
-        MainNode* next;
+class MainNode {
+public:
+    MainNode* prev;
+    MainNode* next;
+    ShapeList shapes;
 
-        MainNode();
+    MainNode();
 };
-
-#endif

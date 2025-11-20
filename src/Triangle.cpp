@@ -3,7 +3,7 @@
 * @description Üçgen şeklini ekrana çizen sınıfın kaynak dosyası
 * @course Veri Yapıları 2-A
 * @assignment 1.Ödev
-* @date 19.11.2025
+* @date 17.11.2025
 * @author Batuhan Bektaş batuhan.bektas1@ogr.sakarya.edu.tr G231210379
 */
 

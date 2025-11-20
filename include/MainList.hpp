@@ -6,32 +6,29 @@
 
 class MainList {
 private:
-    MainNode* head;
-    MainNode* tail;
-    MainNode* current;
     int size;
 
 public:
+    MainNode* head;
+    MainNode* tail;
+    MainNode* current;
+
     MainList();
     ~MainList();
 
- 
-    void addNode(MainNode* n);
-      
-    void removeCurrent();    
+    int getSize() const;
 
-    void nextNode();         
-    void prevNode();        
-    
+    void addNode(MainNode* n);
+    void removeCurrent();
+
+    void nextNode();
+    void prevNode();
 
     void drawAll(Screen& s);
 
-
     MainNode* getCurrent();
-    int getSize() const;
 
     void generateRandom(int count);
-
 };
 
 #endif
