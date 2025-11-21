@@ -1,10 +1,10 @@
 /**
 * @file main.cpp
-* @description Basit test: Ekrana birkaç şekil çizdirir
+* @description Programı başlatan ana fonksiyon
 * @course Veri Yapıları 2-A
 * @assignment 1.Ödev
 * @date 19.11.2025
-* @author ...
+* @author Batuhan Bektaş batuhan.bektas1@ogr.sakarya.edu.tr G231210379
 */
 
 #include "Screen.hpp"
@@ -22,5 +22,3 @@ int main() {
     app.run();
     return 0;
 }
-
-

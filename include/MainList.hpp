@@ -2,36 +2,36 @@
 #define MAINLIST_HPP
 
 #include "MainNode.hpp"
-#include <vector>
+#include "Screen.hpp" 
+#include <string>
+
 
 class MainList {
-private:
-    int size;
-
 public:
-    MainNode* head;
-    MainNode* tail;
-    MainNode* current;
-
-    MainNode* getHead() const;
-
-
     MainList();
     ~MainList();
 
-    int getSize() const;
-
     void addNode(MainNode* n);
+    void generateRandom(int count);
     void removeCurrent();
-
+    void drawAll(Screen& s);
     void nextNode();
     void prevNode();
-
-    void drawAll(Screen& s);
-
     MainNode* getCurrent();
+    MainNode* getHead() const;
+    int getSize() const;
 
-    void generateRandom(int count);
+    // YENİ EKLENENLER:
+    void clear();
+    void saveToFile(const std::string& filename) const;
+    void loadFromFile(const std::string& filename);
+
+private:
+    MainNode* head;
+    MainNode* tail;
+    MainNode* current;
+    int size;
 };
+
 
 #endif

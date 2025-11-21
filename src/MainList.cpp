@@ -7,13 +7,11 @@
 * @author Batuhan Bektaş batuhan.bektas1@ogr.sakarya.edu.tr G231210379
 */
 
-
 #include <cstdlib>
 #include <ctime>
-#include "../include/MainList.hpp"
 #include <iostream>
-#include <algorithm>
-#include <vector>              
+#include <fstream>
+#include "../include/MainList.hpp"
 #include "../include/Rectangle.hpp"
 #include "../include/Triangle.hpp"
 #include "../include/Star.hpp"
@@ -23,10 +21,26 @@
 #include "../include/ShapeList.hpp"
 #include "../include/Shape.hpp"
 
-
 using namespace std;
 
 MainList::MainList() : head(nullptr), tail(nullptr), current(nullptr), size(0) {}
+
+void MainList::clear() {
+    MainNode* temp = head;
+    while (temp != nullptr) {
+        MainNode* toDelete = temp;
+        temp = temp->next;
+        delete toDelete;   // MainNode yıkıcısında ShapeList zaten temizleniyor
+    }
+    head    = nullptr;
+    tail    = nullptr;
+    current = nullptr;
+    size    = 0;
+}
+
+MainList::~MainList() {
+    clear();
+}
 
 void MainList::addNode(MainNode* n) {
     if (head == nullptr) {
@@ -34,41 +48,26 @@ void MainList::addNode(MainNode* n) {
     } 
     else {
         tail->next = n;
-        n->prev = tail;
-        tail = n;
+        n->prev    = tail;
+        tail       = n;
     }
 
     size++;
-}
-
-
-MainList::~MainList() {
-    MainNode* temp = head;
-    while (temp != nullptr) {
-        MainNode* toDelete = temp;
-        temp = temp->next;
-        delete toDelete;
-    }
 }
 
 MainNode* MainList::getHead() const {
     return head;
 }
 
-
-
 void MainList::generateRandom(int count) {
-    srand(time(nullptr)); // tek sefer çağrılacağı için sorun yok
+    // Rastgele sayı üreticisini sadece bir kez seed et
+    srand((unsigned)time(nullptr));
 
     for (int i = 0; i < count; i++) {
         MainNode* n = new MainNode();
         
-        // 3 ile 10 arası shape (max 10 olacak şekilde)
-        int shapeCount = 3 + (rand() % 8); // 3..10
-
-        // Her node kendi rastgele seed’ine göre farklı sahneye sahip olsun
-        unsigned int nodeSeed = static_cast<unsigned int>(time(nullptr)) + i * 37;
-        srand(nodeSeed);
+        // 2 ile 7 arası shape
+        int shapeCount = 2 + (rand() % 6); // 2..7
 
         for (int s = 0; s < shapeCount; s++) {
             int t = rand() % 3;
@@ -97,7 +96,7 @@ void MainList::generateRandom(int count) {
 
             const char chars[] = { '#', '*', '&', '+', 'o' };
             char c = chars[rand() % 5];
-            int z = rand() % 100;
+            int z  = rand() % 100;
 
             if (t == 0)
                 sh = new Rectangle(x, y, w, h, z, c);
@@ -111,60 +110,67 @@ void MainList::generateRandom(int count) {
 
         addNode(n);
     }
-
-    // Liste oluşturulduktan sonra tekrar ana random’u karıştır
-    srand(static_cast<unsigned int>(time(nullptr)));
 }
-
-
-
-
 
 void MainList::removeCurrent() {
     if (current == nullptr) return;
 
     MainNode* del = current;
 
-        if (del->prev != nullptr) del->prev->next = del->next;
-        if (del->next != nullptr) del->next->prev = del->prev;
+    if (del->prev != nullptr) del->prev->next = del->next;
+    if (del->next != nullptr) del->next->prev = del->prev;
 
     if (del == head) head = del->next;
     if (del == tail) tail = del->prev;
 
-   if (del->next != nullptr)
-    current = del->next;   
-else
-    current = del->prev;  
+    if (del->next != nullptr)
+        current = del->next;
+    else
+        current = del->prev;
+
     delete del;
     size--;
 }
 
-
 void MainList::drawAll(Screen& s) {
-    // Hiç node yoksa hiçbir şey çizme
     if (current == nullptr)
         return;
 
-    std::vector<Shape*> allShapes;
+    int count = current->shapes.getSize();
+    if (count == 0)
+        return;
 
-    // SADECE current node'un içindeki şekilleri al
+    // 1) Shape pointerlarını diziye doldur
+    Shape** arr = new Shape*[count];
+
     ShapeNode* cur = current->shapes.getHead();
-    while (cur) {
-        allShapes.push_back(cur->data);
-        cur = cur->next;
+    for (int i = 0; i < count; ++i) {
+        arr[i] = cur->data;
+        cur    = cur->next;
     }
 
-    // Z-değerine göre sırala (önce arkadakiler, sonra öndekiler)
-    std::sort(allShapes.begin(), allShapes.end(),
-              [](Shape* a, Shape* b) { return a->getZ() < b->getZ(); });
-
-    // Sadece bu node'un şekillerini ekrana çiz
-    for (Shape* sh : allShapes) {
-        sh->draw(s);
+    // 2) Z-değerine göre basit selection sort
+    for (int i = 0; i < count - 1; ++i) {
+        int minIdx = i;
+        for (int j = i + 1; j < count; ++j) {
+            if (arr[j]->getZ() < arr[minIdx]->getZ()) {
+                minIdx = j;
+            }
+        }
+        if (minIdx != i) {
+            Shape* tmp  = arr[i];
+            arr[i]      = arr[minIdx];
+            arr[minIdx] = tmp;
+        }
     }
+
+    // 3) Sıraya göre çiz
+    for (int i = 0; i < count; ++i) {
+        arr[i]->draw(s);
+    }
+
+    delete[] arr;
 }
-
-
 
 void MainList::nextNode() {
     if (current && current->next != nullptr)
@@ -184,3 +190,113 @@ int MainList::getSize() const {
     return size;
 }
 
+//-----------------------------------------------------
+//  DOSYAYA KAYDETME
+//-----------------------------------------------------
+void MainList::saveToFile(const std::string& filename) const {
+    ofstream out(filename.c_str());
+    if (!out) {
+        cerr << "Dosya acilamadi: " << filename << endl;
+        return;
+    }
+
+    // 1) Node sayısını yaz
+    out << size << '\n';
+
+    // 2) Her node için şekil sayısı ve şekillerin bilgileri
+    MainNode* node = head;
+    while (node != nullptr) {
+        int shapeCount = node->shapes.getSize();
+        out << shapeCount << '\n';
+
+        ShapeNode* sn = node->shapes.getHead();
+        while (sn != nullptr) {
+            Shape* sh = sn->data;
+
+            // Tipi belirle (R=Rectangle, T=Triangle, S=Star)
+            char typeChar = 'R';
+            if (dynamic_cast<Triangle*>(sh) != nullptr) {
+                typeChar = 'T';
+            }
+            else if (dynamic_cast<Star*>(sh) != nullptr) {
+                typeChar = 'S';
+            }
+
+            out << typeChar << ' '
+                << sh->getX()      << ' '
+                << sh->getY()      << ' '
+                << sh->getWidth()  << ' '
+                << sh->getHeight() << ' '
+                << sh->getZ()      << ' '
+                << sh->getDrawChar() << '\n';
+
+            sn = sn->next;
+        }
+
+        node = node->next;
+    }
+}
+
+//-----------------------------------------------------
+//  DOSYADAN YÜKLEME
+//-----------------------------------------------------
+void MainList::loadFromFile(const std::string& filename) {
+    ifstream in(filename.c_str());
+    if (!in) {
+        cerr << "Dosya acilamadi: " << filename << endl;
+        return;
+    }
+
+    clear();    // önce mevcut listeyi temizle
+
+    int nodeCount = 0;
+    if (!(in >> nodeCount)) {
+        cerr << "Dosya formati hatali (node sayisi okunamadi)." << endl;
+        return;
+    }
+
+    for (int i = 0; i < nodeCount; ++i) {
+        MainNode* node = new MainNode();
+
+        int shapeCount = 0;
+        if (!(in >> shapeCount)) {
+            cerr << "Dosya formati hatali (shape sayisi okunamadi)." << endl;
+            delete node;
+            break;
+        }
+
+        for (int s = 0; s < shapeCount; ++s) {
+            char typeChar;
+            int x, y, w, h, z;
+            char drawChar;
+
+            if (!(in >> typeChar >> x >> y >> w >> h >> z >> drawChar)) {
+                cerr << "Dosya formati hatali (shape bilgisi okunamadi)." << endl;
+                break;
+            }
+
+            Shape* sh = nullptr;
+            switch (typeChar) {
+                case 'R':
+                    sh = new Rectangle(x, y, w, h, z, drawChar);
+                    break;
+                case 'T':
+                    sh = new Triangle(x, y, w, h, z, drawChar);
+                    break;
+                case 'S':
+                    sh = new Star(x, y, w, h, z, drawChar);
+                    break;
+                default:
+                    // Taninmayan tip gelirse default olarak Rectangle al
+                    sh = new Rectangle(x, y, w, h, z, drawChar);
+                    break;
+            }
+
+            node->shapes.addShape(sh);
+        }
+
+        addNode(node);
+    }
+
+    current = head;
+}

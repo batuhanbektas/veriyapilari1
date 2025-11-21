@@ -4,6 +4,7 @@
  * @course Veri Yapıları 2-A
  * @assignment 1.Ödev
  * @date 20.11.2025
+ * @author Batuhan Bektaş batuhan.bektas1@ogr.sakarya.edu.tr G231210379
  */
 
 #include <iostream>
@@ -16,8 +17,29 @@
 #include "../include/Screen.hpp"
 
 App::App() {
-    // Başlangıçta sahneyi rasgele oluştur
-    mainList.generateRandom(10);  // ~20 node
+    // Açılışta kullanıcıya sor: Dosyadan mı, rastgele mi?
+    char secim;
+    std::cout << "Sahne nasil yüklensin?\n";
+    std::cout << "1) Dosyadan yukle (data.txt)\n";
+    std::cout << "2) Rastgele olustur\n";
+    std::cout << "Secim (1/2): ";
+    std::cin >> secim;
+
+    if (secim == '1') {
+        // Dosyadan yükleme
+        mainList.loadFromFile("data.txt");
+
+        // Dosya bos veya hataliysa fallback: rastgele olustur
+        if (mainList.getSize() == 0) {
+            std::cout << "Dosya okunamadi ya da sahne bos. "
+                         "Rastgele sahne olusturuluyor...\n";
+            mainList.generateRandom(20);  // ~20 node
+        }
+    }
+    else {
+        // Rastgele sahne
+        mainList.generateRandom(20);      // ~20 node
+    }
 
     currentMain  = mainList.getCurrent();
     currentShape = nullptr;
@@ -48,7 +70,7 @@ void App::drawNodeList(Screen& screen) {
 }
 
 void App::renderAll(Screen& screen) {
-    // Tüm şekilleri z-sıralı çizer
+    // Aktif node'un tüm şekillerini z-sıralı çizer
     mainList.drawAll(screen);
 
     // Solda node listesini çiz
@@ -101,13 +123,14 @@ void App::handleInput(char key) {
     //---------------------------------------
     if (mode == MODE_SHAPE) {
 
-          if (currentMain && currentMain->shapes.isEmpty()) {
-        mainList.removeCurrent();
-        currentMain  = mainList.getCurrent();
-        currentShape = nullptr;
-        mode         = MODE_LIST;
-        return;
-    }
+        // Seçili node boş kaldıysa node'u da sil ve liste moduna dön
+        if (currentMain && currentMain->shapes.isEmpty()) {
+            mainList.removeCurrent();
+            currentMain  = mainList.getCurrent();
+            currentShape = nullptr;
+            mode         = MODE_LIST;
+            return;
+        }
 
         if (!currentMain) {
             // Node kalmamışsa tekrar liste moduna dön
@@ -141,40 +164,38 @@ void App::handleInput(char key) {
             return;
         }
 
-      // c: seçili shape'i sil
-if (key == 'c' || key == 'C') {
-    if (currentMain && currentShape) {
+        // c: seçili shape'i sil
+        if (key == 'c' || key == 'C') {
+            if (currentMain && currentShape) {
 
-        // 1) currentShape'in listedeki indeksini bul
-        int index = 0;
-        ShapeNode* iter = currentMain->shapes.getHead();
-        while (iter && iter != currentShape) {
-            iter = iter->next;
-            index++;
+                // 1) currentShape'in listedeki indeksini bul
+                int index = 0;
+                ShapeNode* iter = currentMain->shapes.getHead();
+                while (iter && iter != currentShape) {
+                    iter = iter->next;
+                    index++;
+                }
+
+                // Her ihtimale karşı: currentShape listede değilse hiçbir şey yapma
+                if (!iter) return;
+
+                // 2) Seçili shape'i sil
+                currentMain->shapes.removeIndex(index);
+
+                // 3) Bu node'un içinde hiç shape kalmadıysa node'u da sil
+                if (currentMain->shapes.isEmpty()) {
+                    mainList.removeCurrent();              // current node'u listeden sil
+                    currentMain  = mainList.getCurrent();  // yeni current node (veya nullptr)
+                    currentShape = nullptr;
+                    mode         = MODE_LIST;              // şekil kalmadı, liste moduna dön
+                    return;                                // önemli: buradan çık
+                }
+
+                // 4) Hâlâ şekil varsa, basitçe baştaki shape'i seç
+                currentShape = currentMain->shapes.getHead();
+            }
+            return;
         }
-
-        // Her ihtimale karşı: currentShape listede değilse hiçbir şey yapma
-        if (!iter) return;
-
-        // 2) Seçili shape'i sil
-        currentMain->shapes.removeIndex(index);
-
-        // 3) Bu node'un içinde hiç shape kalmadıysa node'u da sil
-        if (currentMain->shapes.isEmpty()) {
-            mainList.removeCurrent();              // current node'u listeden sil
-            currentMain  = mainList.getCurrent();  // yeni current node (veya nullptr)
-            currentShape = nullptr;
-            mode         = MODE_LIST;              // şekil kalmadı, liste moduna dön
-            return;                                // önemli: buradan çık
-        }
-
-        // 4) Hâlâ şekil varsa, basitçe baştaki shape'i seç
-        currentShape = currentMain->shapes.getHead();
-    }
-    return;
-
-}
-
 
         // Hareket: w/a/s/d
         if (currentShape) {
@@ -242,11 +263,15 @@ void App::run() {
             std::cout << "(c) sekil sil      (g) liste moduna don\n";
         }
 
-        std::cout << "\n(0) Cikis\n";
+        std::cout << "\n(0) Cikis (ve kaydet)\n";
 
         key = _getch();
-        if (key == '0') // 0'a basınca programdan tamamen çık
+
+        // 0'a basınca dosyaya kaydet ve programdan çık
+        if (key == '0') {
+            mainList.saveToFile("data.txt");
             break;
+        }
 
         handleInput(key);
     }
