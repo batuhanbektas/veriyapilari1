@@ -21,7 +21,7 @@ public:
     MainNode* getHead() const;
     int getSize() const;
 
-    // YENİ EKLENENLER:
+   
     void clear();
     void saveToFile(const std::string& filename) const;
     void loadFromFile(const std::string& filename);

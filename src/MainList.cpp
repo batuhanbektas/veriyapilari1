@@ -3,7 +3,7 @@
 * @description MainList sınıfının üye fonksiyonlarının tanımlandığı dosya
 * @course Veri Yapıları 2-A
 * @assignment 1.Ödev
-* @date 19.11.2025
+* @date 18.11.2025
 * @author Batuhan Bektaş batuhan.bektas1@ogr.sakarya.edu.tr G231210379
 */
 
@@ -30,7 +30,7 @@ void MainList::clear() {
     while (temp != nullptr) {
         MainNode* toDelete = temp;
         temp = temp->next;
-        delete toDelete;   // MainNode yıkıcısında ShapeList zaten temizleniyor
+        delete toDelete;   
     }
     head    = nullptr;
     tail    = nullptr;
@@ -60,24 +60,20 @@ MainNode* MainList::getHead() const {
 }
 
 void MainList::generateRandom(int count) {
-    // Rastgele sayı üreticisini sadece bir kez seed et
     srand((unsigned)time(nullptr));
 
     for (int i = 0; i < count; i++) {
         MainNode* n = new MainNode();
         
-        // 2 ile 7 arası shape
-        int shapeCount = 2 + (rand() % 6); // 2..7
+        int shapeCount = 2 + (rand() % 6); 
 
         for (int s = 0; s < shapeCount; s++) {
             int t = rand() % 3;
             Shape* sh = nullptr;
 
-            // Boyutları seç
-            int w = 2 + rand() % 10; // 2..11
-            int h = 2 + rand() % 10; // 2..11
+            int w = 2 + rand() % 10; 
+            int h = 2 + rand() % 10; 
 
-            // Ekranı aşmaması için garanti
             if (w >= COLS) w = COLS - 1;
             if (h >= ROWS) h = ROWS - 1;
 
@@ -87,7 +83,6 @@ void MainList::generateRandom(int count) {
             if (maxX < 0) maxX = 0;
             if (maxY < 0) maxY = 0;
 
-            // Solda liste için boşluk bırak
             int minX = 10;
             if (minX > maxX) minX = 0;
 
@@ -140,7 +135,6 @@ void MainList::drawAll(Screen& s) {
     if (count == 0)
         return;
 
-    // 1) Shape pointerlarını diziye doldur
     Shape** arr = new Shape*[count];
 
     ShapeNode* cur = current->shapes.getHead();
@@ -149,7 +143,6 @@ void MainList::drawAll(Screen& s) {
         cur    = cur->next;
     }
 
-    // 2) Z-değerine göre basit selection sort
     for (int i = 0; i < count - 1; ++i) {
         int minIdx = i;
         for (int j = i + 1; j < count; ++j) {
@@ -164,7 +157,6 @@ void MainList::drawAll(Screen& s) {
         }
     }
 
-    // 3) Sıraya göre çiz
     for (int i = 0; i < count; ++i) {
         arr[i]->draw(s);
     }
@@ -193,17 +185,15 @@ int MainList::getSize() const {
 //-----------------------------------------------------
 //  DOSYAYA KAYDETME
 //-----------------------------------------------------
-void MainList::saveToFile(const std::string& filename) const {
+void MainList::saveToFile(const string& filename) const {
     ofstream out(filename.c_str());
     if (!out) {
         cerr << "Dosya acilamadi: " << filename << endl;
         return;
     }
 
-    // 1) Node sayısını yaz
     out << size << '\n';
 
-    // 2) Her node için şekil sayısı ve şekillerin bilgileri
     MainNode* node = head;
     while (node != nullptr) {
         int shapeCount = node->shapes.getSize();
@@ -213,7 +203,6 @@ void MainList::saveToFile(const std::string& filename) const {
         while (sn != nullptr) {
             Shape* sh = sn->data;
 
-            // Tipi belirle (R=Rectangle, T=Triangle, S=Star)
             char typeChar = 'R';
             if (dynamic_cast<Triangle*>(sh) != nullptr) {
                 typeChar = 'T';
@@ -240,14 +229,14 @@ void MainList::saveToFile(const std::string& filename) const {
 //-----------------------------------------------------
 //  DOSYADAN YÜKLEME
 //-----------------------------------------------------
-void MainList::loadFromFile(const std::string& filename) {
+void MainList::loadFromFile(const string& filename) {
     ifstream in(filename.c_str());
     if (!in) {
         cerr << "Dosya acilamadi: " << filename << endl;
         return;
     }
 
-    clear();    // önce mevcut listeyi temizle
+    clear();    
 
     int nodeCount = 0;
     if (!(in >> nodeCount)) {
@@ -287,7 +276,6 @@ void MainList::loadFromFile(const std::string& filename) {
                     sh = new Star(x, y, w, h, z, drawChar);
                     break;
                 default:
-                    // Taninmayan tip gelirse default olarak Rectangle al
                     sh = new Rectangle(x, y, w, h, z, drawChar);
                     break;
             }

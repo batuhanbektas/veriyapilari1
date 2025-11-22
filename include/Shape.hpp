@@ -16,7 +16,6 @@ public:
     Shape(int x, int y, int width, int height, int z, char drawChar);
     virtual ~Shape();
 
-    // Temel getter'lar
     int getX() const;
     int getY() const;
     int getWidth() const;
@@ -27,7 +26,6 @@ public:
     void setPosition(int newX, int newY);
     void setZ(int newZ);
 
-    // Polimorfik arayüz
     virtual void draw(Screen& screen) = 0;
     virtual void move(int dx, int dy);
 };

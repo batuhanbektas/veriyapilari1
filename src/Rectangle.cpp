@@ -9,6 +9,8 @@
 
 #include "Rectangle.hpp"
 
+using namespace std;
+
 Rectangle::Rectangle(int x, int y, int width, int height, int z, char drawChar)
     : Shape(x, y, width, height, z, drawChar) {}
 

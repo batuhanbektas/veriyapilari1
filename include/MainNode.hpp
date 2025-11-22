@@ -1,7 +1,7 @@
-#ifndef MAINNODE_HPP   // HEADER GUARD BAŞI
+#ifndef MAINNODE_HPP   
 #define MAINNODE_HPP
 
-#include "ShapeList.hpp"   // SADECE ShapeList yeterli
+#include "ShapeList.hpp"   
 
 class MainNode {
 public:
@@ -13,4 +13,4 @@ public:
     ~MainNode() = default;
 };
 
-#endif // MAINNODE_HPP  // HEADER GUARD SONU
+#endif

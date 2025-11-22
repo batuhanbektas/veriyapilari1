@@ -3,11 +3,13 @@
 * @description Shape soyut sınıfının üye fonksiyonlarının tanımlandığı dosya
 * @course Veri Yapıları 2-A
 * @assignment 1.Ödev
-* @date 17.11.2025
+* @date 16.11.2025
 * @author Batuhan Bektaş batuhan.bektas1@ogr.sakarya.edu.tr G231210379
 */
 
 #include "Shape.hpp"
+
+using namespace std;
 
 Shape::Shape(int x, int y, int width, int height, int z, char drawChar)
     : x(x), y(y), width(width), height(height), z(z), drawChar(drawChar) {}

@@ -9,14 +9,14 @@
 
 #include "Triangle.hpp"
 
+using namespace std;
+
+
 Triangle::Triangle(int x, int y, int width, int height, int z, char drawChar)
     : Shape(x, y, width, height, z, drawChar) {}
 
 void Triangle::draw(Screen& screen) {
-    // Sol taraftan başlayan, aşağı doğru genişleyen dolu üçgen
-    // y satırı arttıkça, o satırdaki karakter sayısı artıyor
     for (int dy = 0; dy < height; ++dy) {
-        // Satırdaki genişlik: yükseklikle orantılı olacak şekilde ayarlandı
         int rowWidth = (width * (dy + 1)) / height;
         if (rowWidth < 1) rowWidth = 1;
 

@@ -3,12 +3,14 @@
 * @description ShapeList sınıfının üye fonksiyonlarının tanımlandığı dosya
 * @course Veri Yapıları 2-A
 * @assignment 1.Ödev
-* @date 17.11.2025
+* @date 18.11.2025
 * @author Batuhan Bektaş batuhan.bektas1@ogr.sakarya.edu.tr G231210379
 */
 
 #include "../include/ShapeList.hpp"
 #include <iostream>
+
+using namespace std;
 
 ShapeList::ShapeList() : head(nullptr), size(0) {}
 
@@ -17,7 +19,7 @@ ShapeList::~ShapeList() {
     while (temp != nullptr) {
         ShapeNode* del = temp;
         temp = temp->next;
-        delete del->data;  // Shape nesnesini de sil
+        delete del->data;  
         delete del;
     }
 }

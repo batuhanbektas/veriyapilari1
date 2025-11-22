@@ -9,18 +9,17 @@
 class App {
 private:
     enum Mode {
-        MODE_LIST,   // Sadece node listesi arasında gezinme
-        MODE_SHAPE   // Seçili node'un şekilleri arasında gezinme
+        MODE_LIST,   
+        MODE_SHAPE   
     };
 
     MainList  mainList;
     MainNode* currentMain;
     ShapeNode* currentShape;
-    Mode      mode;          // aktif mod
-
+    Mode      mode;         
     void renderAll(Screen& screen);
     void handleInput(char key);
-    void drawNodeList(Screen& screen); // soldaki numara listesi
+    void drawNodeList(Screen& screen); 
 
 public:
     App();

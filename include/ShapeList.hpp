@@ -17,7 +17,7 @@ public:
     Shape* getShape(int index);
 
     int  getSize()   const;
-    bool isEmpty()   const;   // <- eklendi
+    bool isEmpty()   const; 
     ShapeNode* getHead() const;  
 };
 
